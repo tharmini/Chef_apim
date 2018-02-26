@@ -8,7 +8,6 @@
 file_cache_path = node['wso2am']['java_file_cache_path']
 extract_cache_path = node['wso2am']['java_extracted_path']
 java_home = node['wso2am']['java_home']
-java_home_path = "#{java_home}/bin"
 package 'tar'
 
 
@@ -37,7 +36,7 @@ end
 #export java home
 file '/etc/profile.d/jdk.sh' do
   content "export JAVA_HOME=#{java_home}"
-  content "export PATH=#{java_home_path}"
+  content "export PATH=$PATH:$JAVA_HOME/bin"
   mode '0755'
   only_if {node['wso2am']['set_etc_environment'] == true}
 end
