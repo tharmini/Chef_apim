@@ -7,19 +7,13 @@
 #
 file_cache_path = node['wso2am']['java_file_cache_path']
 extract_cache_path = node['wso2am']['java_extracted_path']
-
 java_home = node['wso2am']['java_home']
-default = node['wso2am']['set_default']
-java_home = node['wso2am']['java_home']
-java_home2 = "#{java_home}/bin"
+java_home_path = "#{java_home}/bin"
 package 'tar'
-java_dir_name = "jdk1.8.0_121"
-java_root = java_home.split('/')[0..-1].join('/')
-java_dir = "#{java_root}"
 
 
 #adding java to extracted path
-bash "adding java to #{java_dir}" do
+bash "adding java to #{extract_cache_path}" do
   cwd ::File.dirname(file_cache_path)
   code <<-EOH
 	tar -xvzf "#{file_cache_path}" -C "#{extract_cache_path}"
@@ -30,9 +24,22 @@ end
 #setting java home
 ENV['JAVA_HOME'] = java_home
 bash 'env_test' do
-  code <<-EOF
+  code <<-EOH
   echo $JAVA_HOME
-  EOF
+  EOH
+end
+
+#change the mode
+directory '/etc/profile.d' do
+  mode '0755'
+end
+
+#export java home
+file '/etc/profile.d/jdk.sh' do
+  content "export JAVA_HOME=#{java_home}"
+  content "export PATH=#{java_home_path}"
+  mode '0755'
+  only_if {node['wso2am']['set_etc_environment'] == true}
 end
 
 
@@ -45,10 +52,8 @@ end
 #end
 #
 
-directory '/etc/profile.d' do
-  mode '0755'
-end
 
+#setting envirnmental variables
 
 ruby_block 'set JAVA_HOME in /etc/environment' do
   block do
@@ -60,11 +65,4 @@ ruby_block 'set JAVA_HOME in /etc/environment' do
   only_if { node['wso2am']['set_etc_environment'] }
 end
 
-
-#export java home
-file '/etc/profile.d/jdk.sh' do
-  content "export JAVA_HOME=#{java_home2}"
-  mode '0755'
-  only_if {node['wso2am']['set_etc_environment'] == true}
-end
 
