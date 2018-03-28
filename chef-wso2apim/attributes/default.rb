@@ -3,7 +3,7 @@ default['wso2am']['wso2am_home'] = nil
 default['wso2am']['java_extracted_path'] = '/opt'
 default['wso2am']['java_file_cache_path'] = 'http://10.100.4.252:8090/api/jdk-8u121-linux-x64.tar.gz'
 default['wso2am']['java_file_install_path'] = '~/Downloads/jdk/jdk-8u121-linux-x64.tar.gz'
-default['wso2am']['java_zipfile_name']='jdk-8u121-linux-x64.tar.gz'
+default['wso2am']['java_zipfile_name'] = 'jdk-8u121-linux-x64.tar.gz'
 
 
 default['wso2am']['wso2am_file_install_path'] = '~/Downloads/wso2apii/wso2am-2.1.0.zip'
@@ -15,7 +15,7 @@ default['wso2am']['product_install_dir'] = '/home/tharmini/Downloads/wso2api'
 
 default['wso2am']['product_path'] = '/opt'
 default['wso2am']['product_name'] = 'wso2am'
-default['wso2am']['product_version']='2.1.0'
+default['wso2am']['product_version'] = '2.1.0'
 default['wso2am']['server_ports_offset'] = "1"
 default['wso2am']['enable_secure_vault'] = false
 
@@ -40,7 +40,6 @@ default['wso2am']['trust_store_type'] = 'JKS'
 default['wso2am']['trust_store_password'] = 'wso2carbon'
 
 
-
 default['wso2am']['dep_sync_enabled'] = false
 default['wso2am']['product_profile'] = 'default'
 default['wso2am']['registry_mounts'] = 'true'
@@ -48,12 +47,12 @@ default['wso2am']['wso2registry'] = 'wso2registry'
 
 default['wso2am']['dep_sync_enabled'] = 'false'
 default['wso2am']['dep_sync_auto_commit'] = 'true'
-default['wso2am']['dep_sync_auto_checkout']='true'
+default['wso2am']['dep_sync_auto_checkout'] = 'true'
 default['wso2am']['dep_sync_repository_type'] = 'svn'
 default['wso2am']['dep_sync_svn_url'] = 'https://svn.wso2.org/'
 default['wso2am']['dep_sync_svn_user'] = 'svnuser'
 default['wso2am']['dep_sync_svn_password'] = 'xxxx'
-default['wso2am']['dep_sync_svn_append_tenant_id']='true'
+default['wso2am']['dep_sync_svn_append_tenant_id'] = 'true'
 
 
 default['wso2am']['distributed setup'] = 'true'
@@ -71,9 +70,6 @@ default["govregistry"] =
         "targetPath" => '/_system/governance'
 
     }
-
-
-
 
 
 default["configregistry"] =
@@ -184,23 +180,23 @@ default["master_datasources"] = {
     },
 
 }
-default['wso2am']['apply_gateway_specific_configurations']='true'
+default['wso2am']['apply_gateway_specific_configurations'] = 'true'
 default["clustering"] = {
-    "enabled"           => true,
+    "enabled" => true,
     "membership_scheme" => 'wka',
-    "domain"            => 'wso2.as.domain',
+    "domain" => 'wso2.as.domain',
     "local_member_host" => '10.100.4.252',
     "local_member_port" => '4000',
-    "sub_domain"        => 'mgt',
-    "wka"               => {
+    "sub_domain" => 'mgt',
+    "wka" => {
         "members" => [{
 
-            "hostname" => '10.0.2.15',
-            "port"     => 4000
-        },{
+                          "hostname" => '10.0.2.15',
+                          "port" => 4000
+                      }, {
 
-            "hostname" => '10.0.2.18',
-            "port"     => 4000}]
+                          "hostname" => '10.0.2.18',
+                          "port" => 4000}]
     }
 }
 
