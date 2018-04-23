@@ -1,24 +1,59 @@
+#  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 #
+# WSO2 Inc. licenses this file to you under the Apache License,
+#  Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+#      you may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+#      software distributed under the License is distributed on an
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
 # Cookbook:: chef-wso2apim
 # Recipe:: java_installation
-#
 # Copyright:: 2018, The Authors, All Rights Reserved.
+
 
 install_path = node['wso2am']['java_file_install_path']
 java_zip_name=node['wso2am']['java_zipfile_name']
-
+wso2am_user=node['wso2am']['user']
+wso2am_group=node['wso2am']['group']
 extract_cache_path = node['wso2am']['java_extracted_path']
 java_home = node['wso2am']['java_home']
+
 java_home_path = "#{java_home}/bin"
 
+
+#creating new wso2am_group
+group "#{wso2am_group}" do
+  action :create
+  members #{wso2am_group}
+  append true
+end
+
+#creating new wso2am user
+user "#{wso2am_user}" do
+  action :create
+  shell '/bin/bash'
+  gid node['wso2am']['group']
+  comment node['wso2am']['user_comment']
+  system true
+  manage_home true
+end
+
+#downloading the java zip file into file_cache path
 remote_file "#{Chef::Config[:file_cache_path]}/#{java_zip_name}" do
   source "#{node['wso2am']['java_file_cache_path']}"
+  owner node["wso2am"]["user"]
+  group node["wso2am"]["group"]
   mode '0755'
   not_if {::File.exist?(install_path)}
 end
 
-
-#adding java to extracted path
+#unzip java zip file and put into extracted_path
 bash "adding java to #{extract_cache_path}" do
   cwd Chef::Config[:file_cache_path]
   code <<-EOH
@@ -35,27 +70,7 @@ bash 'env_test' do
   EOH
 end
 
-
-#export java home
-#file '/etc/profile.d/jdk.sh' do
-# content "export JAVA_HOME=#{java_home}"
-#  content "export PATH=$PATH:$JAVA_HOME/bin"
-# mode '0755'
-# only_if {node['wso2am']['set_etc_environment'] == true}
-#end
-
-
-#ruby_block 'set-env-java-home' do
-# block do
-# ENV['JAVA_HOME'] = java_home
-#  end
-#  not_if { ENV['JAVA_HOME'] == java_home }
-#end
-#
-
-
 #setting envirnmental variables in etc environment
-
 ruby_block 'set JAVA_HOME in /etc/environment' do
   block do
     file = Chef::Util::FileEdit.new('/etc/environment')

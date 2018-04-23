@@ -1,27 +1,40 @@
+#  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 #
+# WSO2 Inc. licenses this file to you under the Apache License,
+#  Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+#      you may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+#      software distributed under the License is distributed on an
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
 # Cookbook:: chef-wso2apim
 # Recipe:: wso2_apim_installation
 #
 # Copyright:: 2018, The Authors, All Rights Reserved.
 
+
 install_path = "#{node['wso2am']['wso2am_file_install_path']}"
 wso2api_extracted_path = node['wso2am']['wso2api_extracted_path']
-product_name=node['wso2am']['product_name']
-product_version=node['wso2am']['product_version']
-wso2am_dir_name = "#{product_name}-#{product_version}"
+wso2am_dir_name = "#{node['wso2am']['product_name']}-#{node['wso2am']['product_version']}"
 wso2am_dir = "#{wso2api_extracted_path}/#{wso2am_dir_name}"
-wso2am_bin_name = "#{wso2am_dir_name}/bin"
-bin_path = "#{wso2api_extracted_path}/#{wso2am_bin_name}"
+bin_path = "#{wso2api_extracted_path}/#{wso2am_dir_name}/bin"
 
-
+#copy file to cahe path from appache server
 remote_file "#{Chef::Config[:file_cache_path]}/#{wso2am_dir_name}.zip" do
   source "#{node['wso2am']['wso2am_file_cache_path']}"
+  owner node["wso2am"]["user"]
+  group node["wso2am"]["group"]
   mode '0755'
   not_if {::File.exist?(install_path)}
 end
 
 
-#extract wso2 apim
+#unzip wso2_apim zip file and put into the extracted_path
 bash "adding wso2 to #{wso2api_extracted_path}" do
   cwd Chef::Config[:file_cache_path]
   code <<-EOH
@@ -31,19 +44,23 @@ bash "adding wso2 to #{wso2api_extracted_path}" do
 end
 
 
-#start wso2 server
-include_recipe 'chef-wso2apim::carbon_xml'
-include_recipe 'chef-wso2apim::broker_xml'
-include_recipe 'chef-wso2apim::master_datasouces_xml'
+#including the templates changes
+include_recipe 'chef-wso2apim::apply_template'
 
-include_recipe 'chef-wso2apim::registry_xml'
-include_recipe 'chef-wso2apim::user_mgt_xml'
-include_recipe 'chef-wso2apim::axis2_xml'
-
-
-bash "start_wso2_server " do
-  code <<-EOH
-  	cd #{bin_path}
-	./wso2server.sh --start
-  EOH
-end
+# #start the wso2-apim server different profile exclude trafic manager
+# bash "start_wso2_server " do
+#   code <<-EOH
+#   	cd #{bin_path}
+# 	./wso2server.sh start
+#   EOH
+#   only_if {node['wso2am']['product_profile'] != 'traficmanager'}
+# end
+#
+# #start the wso2-apim server for trafic manager
+# bash "start_trafficmanagger_wso2_server " do
+#   code <<-EOH
+#   	cd #{bin_path}
+# 	./wso2server.sh -Dprofile=traffic-manager start
+#   EOH
+#   only_if {node['wso2am']['product_profile'] == 'traficmanager'}
+# end

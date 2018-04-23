@@ -255,7 +255,7 @@ These stores are accessed for two purposes.
       <timerPeriod>40</timerPeriod>
 
       <!--Number of SlotDeliveryWorker threads that should be started-->
-      <workerThreadCount>5</workerThreadCount>
+      <workerThreadCount><%= node[wso2am][worker] %></workerThreadCount>
 
     </slots>
 
